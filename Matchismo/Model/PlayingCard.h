@@ -12,6 +12,8 @@
 @property (strong, nonatomic) NSString * suit;
 @property (nonatomic) NSUInteger rank;
 
+// list of valid suits
 + (NSArray *) validSuits;
+// max rank value
 + (NSUInteger) maxRank;
 @end

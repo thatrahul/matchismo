@@ -15,6 +15,9 @@
 
 @implementation CardMatchingGame
 
+static const int MISMATCH_PENALTY = 2;
+static const int MATCH_BONUS = 4;
+static const int COST_TO_CHOOSE = 1;
 -(NSMutableArray *) cards {
     if (_cards == nil) {
         _cards = [[NSMutableArray alloc] init];
@@ -43,9 +46,31 @@
 }
 
 - (void) chooseCardAtIndex: (NSUInteger) index {
-    Card * chosen = [self cardAtIndex:index];
+    Card * selectedCard = [self cardAtIndex:index];
     //only do the logic if the card is not matched.
-    if (![chosen isMatched]) {
+    if (!selectedCard.isMatched) {
+        if (selectedCard.isChosen) {
+            selectedCard.chosen = NO;
+        } else {
+            //match against other cards in the game
+            
+            for (Card * other in self.cards) {
+                if (other.isChosen && !other.isMatched) {
+                    int matchScore = [selectedCard match:@[other]];
+                    if (matchScore > 0) {
+                        self.score += matchScore * MATCH_BONUS;
+                        selectedCard.matched = YES;
+                        other.matched = YES;
+                    } else {
+                        self.score -= MISMATCH_PENALTY;
+                        other.chosen = NO;
+                    }
+                    break; //we can only choose two cards at a time
+                }
+            }
+            selectedCard.chosen = YES;
+            self.score -= COST_TO_CHOOSE;
+        }
         
     }
         
